@@ -13,11 +13,6 @@ export const softmax = (x: number[]) => {
   return exp.map(v => v / sum);
 };
 
-// A loss function that measures the average of the squares of the errors - Not used for classification networks
-export const meanSquaredError = (expected: number[], actual: number[]) => {
-  return actual.reduce((acc, v, i) => acc + Math.pow(expected[i] - v, 2), 0) / expected.length;
-}
-
 // A loss function that measures the difference between the expected and actual output - Used for classification networks
 export const crossEntropy = (expected: number[], actual: number[]) => {
   return -expected.reduce((acc, v, i) => acc + v * Math.log(actual[i]), 0);

@@ -1,4 +1,8 @@
-// mnist-stream.ts
+/**
+ * MNISTStream is a class that reads the MNIST dataset from the filesystem.
+ * As it's not essencial for the purpose of this project, most of the code was written by LLM and adapted by me.
+ */
+
 import fs from "fs/promises";
 import path from "path";
 
@@ -14,7 +18,7 @@ const TEST_PATH = {
 
 export type MNISTRow = {
   label: number;               // 0..9
-  pixels: number[];            // length 24*24, values in [0,1], row-major
+  pixels: number[];            // length 28*28, values in [0,1], row-major
 };
 
 export class MNISTStream {

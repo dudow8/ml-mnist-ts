@@ -3,48 +3,21 @@ import {
   createNetworkLayer,
   createOneHotEncoded,
   crossEntropy,
+  shuffleDatasetIndexes,
   sigmoid,
   sigmoidPrime,
   softmax,
 } from "./utils";
 
-type Neuron = {
-  weights: number[];
-  bias: number;
-};
-
-type Layer = {
-  neurons: Neuron[];
-};
-
-type Model = {
-  layers: Layer[];
-  loss?: number;
-};
-
-type ForwardCache = {
-  as: number[][]; // [layer][neuron]
-};
-
-type Gradients = {
-  dws: number[][][];  // [layer][neuron][input]
-  dbs: number[][];    // [layer][neuron]
-  loss: number;
-};
-
-type Sample = {
-  input: number[];
-  label: number;
-};
-
-// This is the trained model TODO: create a function to read the model from a file or create a new model
-const model: Model = {
-  layers: [
-    createNetworkLayer(28 * 28, 16),
-    createNetworkLayer(16, 16),
-    createNetworkLayer(16, 10),
-  ],
-};
+import {
+  Model,
+  ForwardCache,
+  Gradients,
+  Sample,
+  TrainOptions,
+  TrainResult,
+} from "./types";
+import { loadModel, saveModel } from "./utils/model/model.utils";
 
 const forward = (model: Model, input: number[]): ForwardCache => {
   const as: number[][] = [input, ...model.layers.map((layer) => Array.from({ length: layer.neurons.length }, () => 0))];
@@ -133,40 +106,68 @@ const backward = (model: Model, sample: Sample): Gradients => {
   return { dws, dbs, loss };
 }
 
-type TrainOptions = {
-  model: Model;
-  learningRate?: number;
-};
 
-type TrainResult = {
-  model: Model;
-  loss: number;
-};
-
-const train = async ({ model, learningRate = 0.01 }: TrainOptions) : Promise<TrainResult> =>
+const train = async (options: TrainOptions) : Promise<TrainResult> =>
   new Promise((resolve) => new MNISTStream("train").using(async (mnist) => {
-    const firstRow = await mnist.readAt(0);
 
-    if (!firstRow) {
-      throw new Error("No first row");
+    const datasetLenght = mnist.count();
+    const { model, learningRate = 0.01, epochs = 10, batchSize = 10, debug = false } = options;
+
+    const log = (message: string) => {
+      if (debug) {
+        console.log(message);
+      }
+    }
+    
+    const epochsLoss: number[] = Array.from({ length: epochs }, () => 0);
+
+    for(let epoch = 0; epoch < epochs; epoch++) {
+      const datasetRows = shuffleDatasetIndexes(datasetLenght);
+      let epochLoss = 0;
+      
+      for (let batch = 0; batch < datasetLenght / batchSize; batch++) {
+        let gradient: Gradients = { dws: [], dbs: [], loss: 0 };
+        const batchRows = datasetRows.slice(batch * batchSize, (batch + 1) * batchSize);
+
+        for(let r of batchRows) {
+          const row = await mnist.readAt(r);
+
+          if (!row) {
+            throw new Error(`No sample was found for row ${r}`);
+          }
+
+          const sample: Sample = { input: row.pixels, label: row.label };
+          const { dws, dbs, loss } = backward(model, sample);
+
+          if (!(gradient.dws.length && gradient.dbs.length)) {
+            gradient = { dws, dbs, loss };
+            continue;
+          }
+
+          model.layers.forEach((layer, l) => layer.neurons.forEach((neuron, n) => {
+            gradient.dws[l][n] = neuron.weights.map((_, w) => dws[l][n][w] + gradient.dws[l][n][w]);
+            gradient.dbs[l][n] += dbs[l][n];
+          }));
+
+          gradient.loss += loss;
+        };
+
+        const { dws, dbs, loss } = gradient;
+
+        model.layers.forEach((layer, l) => {
+          layer.neurons.forEach((neuron, n) => {
+            neuron.bias = neuron.bias - learningRate * (dbs[l][n] / batchSize);
+            neuron.weights = neuron.weights.map((weight, w) => weight - learningRate * (dws[l][n][w] / batchSize)) ;
+          });
+        });
+
+        epochLoss += loss;
+      };
+
+      epochsLoss[epoch] = epochLoss / datasetLenght;
     }
 
-    // Forward
-    const sample: Sample = {
-      input: firstRow.pixels,
-      label: firstRow.label,
-    };
-
-    const { dws, dbs, loss } = backward(model, sample);
-
-    model.layers.forEach((layer, l) => {
-      layer.neurons.forEach((neuron, n) => {
-        neuron.bias -= learningRate * dbs[l][n];
-        neuron.weights = neuron.weights.map((weight, w) => weight - learningRate * dws[l][n][w]);
-      });
-    });
-
-    resolve({ model, loss });
+    resolve({ model, epochsLoss });
   })
 );
 
@@ -190,8 +191,19 @@ const train = async ({ model, learningRate = 0.01 }: TrainOptions) : Promise<Tra
 //   console.log(`\nCross Entropy: ${ce}`);
 // });
 
-train({ model }).then(({ loss }) => {
-  // TODO:: Persist the model
+const trainingParams = {
+  model: loadModel(),
+  epochs: 10,
+  batchSize: 10,
+  learningRate: 0.01,
+  debug: true
+};
 
-  console.log(`Loss: ${loss}`);
+train(trainingParams).then(({ model, epochsLoss }) => {
+  console.log("Epochs Loss:");
+  console.table(epochsLoss.map((loss, i) => ({ [`Epoch ${i + 1}`]: loss.toFixed(4) })));
+
+  console.log("Saving model...");
+  saveModel(model);
+  console.log("Model saved successfully!");
 });
