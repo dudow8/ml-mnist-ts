@@ -19,6 +19,14 @@ import {
 } from "./types";
 import { loadModel, saveModel } from "./utils/model/model.utils";
 
+const logger = (debug: boolean = false) => {
+  if (debug) {
+    return (message: any, type: "log" | "table" = "log") => console[type](message);
+  }
+
+  return (_: any) => {};
+}
+
 const forward = (model: Model, input: number[]): ForwardCache => {
   const as: number[][] = [input, ...model.layers.map((layer) => Array.from({ length: layer.neurons.length }, () => 0))];
   
@@ -110,18 +118,23 @@ const backward = (model: Model, sample: Sample): Gradients => {
 const train = async (options: TrainOptions) : Promise<TrainResult> =>
   new Promise((resolve) => new MNISTStream("train").using(async (mnist) => {
 
+    const log = logger(options.debug);
     const datasetLenght = mnist.count();
-    const { model, learningRate = 0.01, epochs = 10, batchSize = 10, debug = false } = options;
+    const { model, learningRate = 0.01, epochs = 10, batchSize = 10 } = options;
 
-    const log = (message: string) => {
-      if (debug) {
-        console.log(message);
-      }
-    }
-    
     const epochsLoss: number[] = Array.from({ length: epochs }, () => 0);
 
+    log(`[Training Model]\n`);
+    log(`Dataset Length: ${datasetLenght}`);
+    log(`Epochs: ${epochs}`);
+    log(`Batch Size: ${batchSize}`);
+    log(`Learning Rate: ${learningRate}`);
+    log(`--------------------------------`);
+
     for(let epoch = 0; epoch < epochs; epoch++) {
+      if (epoch > 0) log('--------------');
+      log(`Starting Epoch ${epoch + 1} of ${epochs}`);
+
       const datasetRows = shuffleDatasetIndexes(datasetLenght);
       let epochLoss = 0;
       
@@ -165,7 +178,12 @@ const train = async (options: TrainOptions) : Promise<TrainResult> =>
       };
 
       epochsLoss[epoch] = epochLoss / datasetLenght;
+
+      log(`Finished Epoch ${epoch + 1} with loss: ${epochsLoss[epoch].toFixed(4)}`);
     }
+
+    log(`--------------------------------`);
+    log(`[Finished Training]`);
 
     resolve({ model, epochsLoss });
   })
@@ -200,10 +218,12 @@ const trainingParams = {
 };
 
 train(trainingParams).then(({ model, epochsLoss }) => {
-  console.log("Epochs Loss:");
-  console.table(epochsLoss.map((loss, i) => ({ [`Epoch ${i + 1}`]: loss.toFixed(4) })));
+  const log = logger(trainingParams.debug);
 
-  console.log("Saving model...");
+  log("\nEpochs Loss:");
+  log(epochsLoss.map((loss, i) => ({ 'loss': loss.toFixed(4) })), "table");
+
+  log("Saving model...");
   saveModel(model);
-  console.log("Model saved successfully!");
+  log("Model saved successfully!");
 });

@@ -3,7 +3,7 @@ import { Model } from "../../types";
 import { createNetworkLayer } from "../ml-functions";
 import fs from "fs";
 
-const DEFAULT_MODEL_PATH = path.join(__dirname, "model.json");
+const DEFAULT_MODEL_PATH = path.join(process.cwd(), "trained-model.json");
 
 export const createModel = (): Model => {
   return {
