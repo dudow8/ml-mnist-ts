@@ -1,0 +1,22 @@
+{
+  "name": "ml-3blue-1brown-ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "run": "tsx main.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.6.3",
+  "dependencies": {
+    "@types/node": "^24.10.0",
+    "sharp": "^0.34.5",
+    "tsc": "^2.0.4"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6"
+  }
+}
