@@ -1,5 +1,5 @@
 
-import { loadOrCreateModel, log } from "@lib";
+import { crossEntropy, loadOrCreateModel, log } from "@lib";
 import { Gradients, Sample, TrainOptions, TrainResult } from "@types";
 import { MNISTStream, saveModel, backward, shuffleDatasetIndexes } from "@lib";
 import { DEFAULT_MODEL_CONFIG } from "@const";
@@ -92,18 +92,21 @@ const trainingParams: TrainOptions = {
       model_name: 'default',
     }
   ),
-  epochs: 50,
+  epochs: 2,
   batchSize: 64,
   learningRate: 0.01,
 };
 
 train(trainingParams).then(({ model, epochsLoss, executionTime }) => {
   log("\nEpochs Loss:");
-  log(epochsLoss.map((loss, i) => ({ 'loss': loss.toFixed(4) })), "table");
+  log(epochsLoss.map((loss, i) => ({ 'loss': Number(loss.toFixed(4)) })), "table");
   
-  log(`Execution time: ${(executionTime / 1000 / 60).toFixed(2)} minutes`);
+  const minutes = parseInt((executionTime / 1000 / 60).toString(), 10);
+  const seconds = (((executionTime / 1000) % 60)).toFixed(2);
 
-  log("Saving model...");
+  log(`Executed in ${minutes} minutes and ${seconds} seconds`);
+
+  log("\nSaving model...");
   saveModel(model);
   log("Model saved successfully!");
 });
