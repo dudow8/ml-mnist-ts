@@ -92,7 +92,7 @@ const trainingParams: TrainOptions = {
       model_name: 'default',
     }
   ),
-  epochs: 2,
+  epochs: 50,
   batchSize: 64,
   learningRate: 0.01,
 };
