@@ -1,12 +1,13 @@
 
 
-import { forward, loadModel, logger, MNISTStream, saveModel, softmax } from "./lib";
-import { BenchmarkOptions, BenchmarkResult } from "./types";
+import { DEFAULT_MODEL_CONFIG } from "@const";
+import { forward, loadOrCreateModel, logger, MNISTStream, softmax } from "@lib";
+import { BenchmarkOptions, BenchmarkResult } from "@types";
 
 
 const benchmark = async (options: BenchmarkOptions) : Promise<BenchmarkResult> => 
   new Promise((resolve) => new MNISTStream("test").using(async (mnist) => {
-    const { model } = options;
+    const { model, activationFunction } = options;
     const log = logger(options.debug);
 
     const trainingDatasetLenght = mnist.count();
@@ -28,7 +29,7 @@ const benchmark = async (options: BenchmarkOptions) : Promise<BenchmarkResult> =
         throw new Error(`No sample was found for row ${i}`);
       }
 
-      const { as } = forward(model, sample.pixels);
+      const { as } = forward(model, sample.pixels, activationFunction);
       const classification = softmax(as[as.length - 1]);
       const predicted = classification.indexOf(Math.max(...classification));
       predictions[sample.label === predicted ? "successCount" : "errorCount"]++;
@@ -38,8 +39,12 @@ const benchmark = async (options: BenchmarkOptions) : Promise<BenchmarkResult> =
 }));
 
 
-const benchmarkParams = {
-  model: loadModel(),
+const benchmarkParams: BenchmarkOptions = {
+  model: loadOrCreateModel(
+    DEFAULT_MODEL_CONFIG.layers,
+    DEFAULT_MODEL_CONFIG.activationFunction
+  ),
+  activationFunction: DEFAULT_MODEL_CONFIG.activationFunction,
   debug: true
 };
 

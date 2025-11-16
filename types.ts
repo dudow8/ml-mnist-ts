@@ -1,3 +1,12 @@
+
+
+export type ActivationFunction = 'sigmoid' | 'relu';
+
+export type CreateModelLayer = {
+  input: number;
+  output: number;
+};
+
 export type Neuron = {
   weights: number[];
   bias: number;
@@ -32,6 +41,7 @@ export type TrainOptions = {
   learningRate?: number;
   epochs?: number;
   batchSize?: number;
+  activationFunction: ActivationFunction;
   debug?: boolean;
 };
 
@@ -42,6 +52,7 @@ export type TrainResult = {
 
 export type BenchmarkOptions = {
   model: Model;
+  activationFunction: ActivationFunction;
   debug?: boolean;
 };
 

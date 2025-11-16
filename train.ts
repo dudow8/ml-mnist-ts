@@ -1,13 +1,14 @@
-import { logger } from "./lib";
-import { Gradients, Sample, TrainOptions, TrainResult } from "./types";
-import { MNISTStream, loadModel, saveModel, backward, shuffleDatasetIndexes } from "./lib";
+import { loadOrCreateModel, logger } from "@lib";
+import { Gradients, Sample, TrainOptions, TrainResult } from "@types";
+import { MNISTStream, saveModel, backward, shuffleDatasetIndexes } from "@lib";
+import { DEFAULT_MODEL_CONFIG } from "@const";
 
 export const train = async (options: TrainOptions) : Promise<TrainResult> =>
   new Promise((resolve) => new MNISTStream("train").using(async (mnist) => {
 
     const log = logger(options.debug);
     const datasetLenght = mnist.count();
-    const { model, learningRate = 0.01, epochs = 10, batchSize = 10 } = options;
+    const { model, learningRate = 0.01, epochs = 10, batchSize = 10, activationFunction } = options;
 
     const epochsLoss: number[] = Array.from({ length: epochs }, () => 0);
 
@@ -37,7 +38,7 @@ export const train = async (options: TrainOptions) : Promise<TrainResult> =>
           }
 
           const sample: Sample = { input: row.pixels, label: row.label };
-          const { dws, dbs, loss } = backward(model, sample);
+          const { dws, dbs, loss } = backward(model, sample, activationFunction);
 
           if (!(gradient.dws.length && gradient.dbs.length)) {
             gradient = { dws, dbs, loss };
@@ -76,10 +77,14 @@ export const train = async (options: TrainOptions) : Promise<TrainResult> =>
   })
 );
 
-const trainingParams = {
-  model: loadModel(),
-  epochs: 50,
-  batchSize: 10,
+const trainingParams: TrainOptions = {
+  model: loadOrCreateModel(
+    DEFAULT_MODEL_CONFIG.layers,
+    DEFAULT_MODEL_CONFIG.activationFunction
+  ),
+  activationFunction: DEFAULT_MODEL_CONFIG.activationFunction,
+  epochs: 20,
+  batchSize: 64,
   learningRate: 0.01,
   debug: true
 };

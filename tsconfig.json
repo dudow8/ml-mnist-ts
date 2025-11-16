@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2021",
+    "types": ["node"],
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "@lib": ["./lib/index.ts"],
+      "@lib/*": ["./lib/*"],
+      "@types": ["./types.ts"],
+      "@const": ["./const.ts"],
+    }
+  }
+}

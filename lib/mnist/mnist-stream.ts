@@ -3,17 +3,18 @@
  * As it's not essencial for the purpose of this project, most of the code was written by LLM and adapted by me.
  */
 
-import fs from "fs/promises";
 import path from "path";
+import fs from "fs/promises";
+import { MNIST_DATA_PATH } from "@const";
 
 const TRAIN_PATH = {
-  IMAGES: path.join(__dirname, "data", "train-images.idx3-ubyte"),
-  LABELS: path.join(__dirname, "data", "train-labels.idx1-ubyte"),
+  IMAGES: path.join(MNIST_DATA_PATH, "train-images.idx3-ubyte"),
+  LABELS: path.join(MNIST_DATA_PATH, "train-labels.idx1-ubyte"),
 };
 
 const TEST_PATH = {
-  IMAGES: path.join(__dirname, "data", "t10k-images.idx3-ubyte"),
-  LABELS: path.join(__dirname, "data", "t10k-labels.idx1-ubyte"),
+  IMAGES: path.join(MNIST_DATA_PATH, "t10k-images.idx3-ubyte"),
+  LABELS: path.join(MNIST_DATA_PATH, "t10k-labels.idx1-ubyte"),
 };
 
 export type MNISTRow = {
