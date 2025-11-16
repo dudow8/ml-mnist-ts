@@ -50,10 +50,10 @@ const benchmarkParams: BenchmarkOptions = {
 benchmark(benchmarkParams).then((predictions) => {
   log("\nBenchmark Results:");
   log({
-    'nTotal Samples': predictions.samples,
-    'Predicted Successfully': predictions.successCount,
-    'Predicted Errorfully': predictions.errorCount,
-    'Accuracy': Number((predictions.successCount / predictions.samples).toFixed(4)),
-    'Error Rate': Number((predictions.errorCount / predictions.samples).toFixed(4)),
+    'Total Samples': predictions.samples,
+    'Successfully Predicted': predictions.successCount,
+    'Errorfully Predicted': predictions.errorCount,
+    'Accuracy in %': Number(((predictions.successCount / predictions.samples) * 100).toFixed(4)),
+    'Error Rate in %': Number(((predictions.errorCount / predictions.samples) * 100).toFixed(4)),
   }, "table");
 });

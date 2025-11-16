@@ -35,6 +35,8 @@ export const createNetworkLayer = (inputSize: number, outputSize: number, activa
 };
 
 export const createModel = (layers: CreateModelLayer[], activationFunction: ActivationFunction = 'sigmoid'): Model => {
+  log(`Initializing new model with ${activationFunction} activation function`);
+
   return {
     layers: layers.map(({ input, output }) => createNetworkLayer(input, output, activationFunction)),
   };

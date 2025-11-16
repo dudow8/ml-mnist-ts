@@ -53,6 +53,7 @@ export type TrainOptions = {
 export type TrainResult = {
   model: Model;
   epochsLoss: number[];
+  executionTime: number;
 };
 
 export type BenchmarkOptions = {

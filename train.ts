@@ -6,6 +6,7 @@ import { DEFAULT_MODEL_CONFIG } from "@const";
 
 export const train = async (options: TrainOptions) : Promise<TrainResult> =>
   new Promise((resolve) => new MNISTStream("train").using(async (mnist) => {
+    const startTime = performance.now();
 
     const datasetLenght = mnist.count();
     const {
@@ -79,7 +80,8 @@ export const train = async (options: TrainOptions) : Promise<TrainResult> =>
     log(`--------------------------------`);
     log(`[Finished Training]`);
 
-    resolve({ model, epochsLoss });
+    const executionTime = performance.now() - startTime;
+    resolve({ model, epochsLoss, executionTime });
   })
 );
 
@@ -95,9 +97,11 @@ const trainingParams: TrainOptions = {
   learningRate: 0.01,
 };
 
-train(trainingParams).then(({ model, epochsLoss }) => {
+train(trainingParams).then(({ model, epochsLoss, executionTime }) => {
   log("\nEpochs Loss:");
   log(epochsLoss.map((loss, i) => ({ 'loss': loss.toFixed(4) })), "table");
+  
+  log(`Execution time: ${(executionTime / 1000 / 60).toFixed(2)} minutes`);
 
   log("Saving model...");
   saveModel(model);
