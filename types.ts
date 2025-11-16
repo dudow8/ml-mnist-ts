@@ -39,3 +39,14 @@ export type TrainResult = {
   model: Model;
   epochsLoss: number[];
 };
+
+export type BenchmarkOptions = {
+  model: Model;
+  debug?: boolean;
+};
+
+export type BenchmarkResult = {
+  samples: number;
+  successCount: number;
+  errorCount: number;
+};

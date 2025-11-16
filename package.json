@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "train": "tsx main.ts",
+    "train": "tsx train.ts",
+    "benchmark": "tsx benchmark.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
