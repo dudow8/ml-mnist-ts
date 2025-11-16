@@ -42,7 +42,7 @@ const benchmark = async (options: BenchmarkOptions) : Promise<BenchmarkResult> =
 const benchmarkParams: BenchmarkOptions = {
   model: loadOrCreateModel(
     DEFAULT_MODEL_CONFIG.layers, {
-      model_name: '100-epochs',
+      model_name: 'default',
     }
   ),
 };

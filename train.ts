@@ -83,6 +83,7 @@ export const train = async (options: TrainOptions) : Promise<TrainResult> =>
   })
 );
 
+// Pretty good configrations for MINIST
 const trainingParams: TrainOptions = {
   model: loadOrCreateModel(
     DEFAULT_MODEL_CONFIG.layers, {
