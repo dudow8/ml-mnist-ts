@@ -1,7 +1,11 @@
+
 import path from "path";
 import { ActivationFunction, CreateModelLayer } from "@types";
 
-export const DEFAULT_MODEL_PATH = path.join(process.cwd(), "trained-model.json");
+export const DEBUGGING = true;
+
+export const DEFAULT_MODEL_NAME = "default";
+export const DEFAULT_MODEL_PATH = path.join(process.cwd(), "trained-models");
 export const MNIST_DATA_PATH = path.join(process.cwd(), "lib/mnist/data")
 
 export const MODEL_CONFIGS = {

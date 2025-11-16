@@ -1,5 +1,4 @@
 
-
 export type ActivationFunction = 'sigmoid' | 'relu';
 
 export type CreateModelLayer = {
@@ -21,6 +20,12 @@ export type Model = {
   loss?: number;
 };
 
+export type PersistedModelOptions = {
+  activationFunction?: ActivationFunction;
+  model_path?: string;
+  model_name?: string;
+};
+
 export type ForwardCache = {
   as: number[][]; // [layer][neuron]
 };
@@ -36,13 +41,13 @@ export type Sample = {
   label: number;
 };
 
+
 export type TrainOptions = {
   model: Model;
   learningRate?: number;
   epochs?: number;
   batchSize?: number;
-  activationFunction: ActivationFunction;
-  debug?: boolean;
+  activationFunction?: ActivationFunction;
 };
 
 export type TrainResult = {
@@ -52,8 +57,7 @@ export type TrainResult = {
 
 export type BenchmarkOptions = {
   model: Model;
-  activationFunction: ActivationFunction;
-  debug?: boolean;
+  activationFunction?: ActivationFunction;
 };
 
 export type BenchmarkResult = {

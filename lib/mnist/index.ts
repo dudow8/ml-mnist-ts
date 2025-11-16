@@ -1,1 +1,1 @@
-export * from "./mnist-stream";
+export * from "./mnist-stream.lib";

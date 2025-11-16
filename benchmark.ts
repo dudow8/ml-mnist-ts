@@ -1,14 +1,14 @@
 
-
 import { DEFAULT_MODEL_CONFIG } from "@const";
-import { forward, loadOrCreateModel, logger, MNISTStream, softmax } from "@lib";
+import { forward, loadOrCreateModel, log, MNISTStream, softmax } from "@lib";
 import { BenchmarkOptions, BenchmarkResult } from "@types";
-
 
 const benchmark = async (options: BenchmarkOptions) : Promise<BenchmarkResult> => 
   new Promise((resolve) => new MNISTStream("test").using(async (mnist) => {
-    const { model, activationFunction } = options;
-    const log = logger(options.debug);
+    const {
+      model,
+      activationFunction = DEFAULT_MODEL_CONFIG.activationFunction,
+    } = options;
 
     const trainingDatasetLenght = mnist.count();
 
@@ -41,16 +41,13 @@ const benchmark = async (options: BenchmarkOptions) : Promise<BenchmarkResult> =
 
 const benchmarkParams: BenchmarkOptions = {
   model: loadOrCreateModel(
-    DEFAULT_MODEL_CONFIG.layers,
-    DEFAULT_MODEL_CONFIG.activationFunction
+    DEFAULT_MODEL_CONFIG.layers, {
+      model_name: '100-epochs',
+    }
   ),
-  activationFunction: DEFAULT_MODEL_CONFIG.activationFunction,
-  debug: true
 };
 
 benchmark(benchmarkParams).then((predictions) => {
-  const log = logger(benchmarkParams.debug);
-
   log("\nBenchmark Results:");
   log({
     'nTotal Samples': predictions.samples,
